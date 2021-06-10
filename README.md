@@ -106,13 +106,13 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | How can we represent the system in an **architecture diagram**, which gives information both about the Docker containers, the communication protocols and the commands? |
 | | *Insert your diagram here...* |
 |Question | Who is going to **send UDP datagrams** and **when**? |
-| | *Enter your response here...* |
+| | Les musiciens vont envoyer des datagrammes UDP toutes les secondes |
 |Question | Who is going to **listen for UDP datagrams** and what should happen when a datagram is received? |
-| | *Enter your response here...* |
+| | L'auditeur va s'abonner au groupe multicast correspondant aux musiciens et va recevoir le bruit des instruments (soundNotification). Une fois reçu, il mettra à jour sa liste de musiciens actifs. |
 |Question | What **payload** should we put in the UDP datagrams? |
-| | *Enter your response here...* |
+| | Le payload envoyé par les musiciens sera un objet JSON contenant les informations suivantes : <br /> <br /> <pre>{ <br/>   "uuid" : "aa7d8cb3-a15f-4f06-a0eb-b8feb6244a60",<br/>   "instrument" : "piano",<br/>   "issued_at" : "2016-04-27T05:20:50.731Z"<br>}</pre>On a donc l'id du musicien, l'instrument joué et la date/heure de l'émission du datagramme.|
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
-| | *Enter your response here...* |
+| | L'auditeur gèrera une `Map` (association entre le uuid et l'instrument) contenant les musiciens actifs. Quand il reçoit un datagramme UDP d'un musicien, l'objet JSON reçu est stocké dans la `Map`. Si un objet existe déjà avec cet `uuid`, il est remplacé avec le nouveau, sinon il est ajouté. Lorsque le client ouvre une connexion TCP sur l'auditeur, celui-ci met à jour la `Map` en supprimant toutes les entrées où l'objet est plus vieux que 5 secondes, et retourne cette `Map` sous forme de tableau JSON au client. |
 
 
 ## Task 2: implement a "musician" Node.js application
