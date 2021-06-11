@@ -1,0 +1,15 @@
+{
+  "name": "musician",
+  "version": "1.0.0",
+  "description": "A musican that emit sound with an instrument",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dayjs": "^1.10.5",
+    "uuid": "^8.3.2"
+  }
+}

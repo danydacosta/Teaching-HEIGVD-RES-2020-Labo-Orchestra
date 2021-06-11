@@ -110,7 +110,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 |Question | Who is going to **listen for UDP datagrams** and what should happen when a datagram is received? |
 | | L'auditeur va s'abonner au groupe multicast correspondant aux musiciens et va recevoir le bruit des instruments (soundNotification). Une fois reçu, il mettra à jour sa liste de musiciens actifs. |
 |Question | What **payload** should we put in the UDP datagrams? |
-| | Le payload envoyé par les musiciens sera un objet JSON contenant les informations suivantes : <br /> <br /> <pre>{ <br/>   "uuid" : "aa7d8cb3-a15f-4f06-a0eb-b8feb6244a60",<br/>   "instrument" : "piano",<br/>   "issued_at" : "2016-04-27T05:20:50.731Z"<br>}</pre>On a donc l'id du musicien, l'instrument joué et la date/heure de l'émission du datagramme.|
+| | Le payload envoyé par les musiciens sera un objet JSON contenant les informations suivantes : <br /> <br /> <pre>{ <br/>   "uuid" : "aa7d8cb3-a15f-4f06-a0eb-b8feb6244a60",<br/>   "instrument" : "piano",<br/>   "sound" : "ti-ta-ti",<br/>   "issued_at" : "2016-04-27T05:20:50.731Z"<br>}</pre>On a donc l'id du musicien, l'instrument joué et la date/heure de l'émission du datagramme.|
 |Question | What **data structures** do we need in the UDP sender and receiver? When will we update these data structures? When will we query these data structures? |
 | | L'auditeur gèrera une `Map` (association entre le uuid et l'instrument) contenant les musiciens actifs. Quand il reçoit un datagramme UDP d'un musicien, l'objet JSON reçu est stocké dans la `Map`. Si un objet existe déjà avec cet `uuid`, il est remplacé avec le nouveau, sinon il est ajouté. Lorsque le client ouvre une connexion TCP sur l'auditeur, celui-ci met à jour la `Map` en supprimant toutes les entrées où l'objet est plus vieux que 5 secondes, et retourne cette `Map` sous forme de tableau JSON au client. |
 
@@ -120,21 +120,21 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | In a JavaScript program, if we have an object, how can we **serialize it in JSON**? |
-| | *Enter your response here...*  |
+| | On peut utiliser la fonction ` JSON.stringify(myObject)`  |
 |Question | What is **npm**?  |
-| | *Enter your response here...*  |
+| | "npm is a set of command line tools that work together with the node registry". C'est un gestionnaire de paquet permettant d'installer n'importe quel paquet depuis une registre publique de plus de 800'000 paquets.  |
 |Question | What is the `npm install` command and what is the purpose of the `--save` flag?  |
-| | *Enter your response here...*  |
+| | Cette commande permet de télécharger et d'installer les dépendances (paquets) d'un programme. Dans le fichier `package.json` sont listés toutes les dépendances utilisées par le programme. En tapant la commande `npm install` on télécharge les dépendances dans un répertoire `node_modules`. L'option `--save` est utilisée lorsque l'on veut ajouter une nouvelle dépendance à notre programme. La nouvelle dépendance sera automatiquement ajoutée au fichier `package.json`. À noter que depuis npm 5, le `--save` n'est plus requis car `npm install` ajoute par défaut la dépendance au `package.json`.  |
 |Question | How can we use the `https://www.npmjs.com/` web site?  |
-| | *Enter your response here...*  |
+| | Depuis le site on peut rechercher le paquet désiré et retrouver une documentation technique de chaque paquet. Celle-ci nous indique souvent que pour l'installation il faut utiliser la commande `npm install <package>` |
 |Question | In JavaScript, how can we **generate a UUID** compliant with RFC4122? |
-| | *Enter your response here...*  |
+| | Nous avons utilisé un paquet existant `uuid` (https://www.npmjs.com/package/uuid). On peut ainsi simplement généré un uuid en utilisant la fonction `uuidv4()`   |
 |Question | In Node.js, how can we execute a function on a **periodic** basis? |
-| | *Enter your response here...*  |
+| | Nous avons utilisé la fonction `setInterval(sendSoundNotification, 1000)`, celle-ci prend en premier paramètre la fonction a exécuter périodiquement et en second paramètre l'intervalle de temps entre chaque exécution en ms.  |
 |Question | In Node.js, how can we **emit UDP datagrams**? |
-| | *Enter your response here...*  |
+| | Nous avons utilisé la classe `UDP/dgram.socket` (https://nodejs.org/api/dgram.html#dgram_udp_datagram_sockets). On commence par créer un socket UDP avec `var sock = dgram.createSocket("udp4")`. On peut ensuite utiliser la fonction `send` pour envoyer notre payload sur l'adresse/port multicast désiré : `sock.send(json, port, addr)` |
 |Question | In Node.js, how can we **access the command line arguments**? |
-| | *Enter your response here...*  |
+| | Nous avons utilisé `process.argv`. C'est un tableau contenant les arguments de la CLI. Le premier élément sera tout le temps `node`, le second le nom du programme, dans notre cas `app.js`, et à partir du troisième élément on retrouve les arguments passé à la CLI. |
 
 
 ## Task 3: package the "musician" app in a Docker image
@@ -142,17 +142,17 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | How do we **define and build our own Docker image**?|
-| | *Enter your response here...*  |
+| | Nous utilisons un Dockerfile permettant de décrire une image. Cette image sera basée sur une image existante de la dernière version de node. On commence par copier le contenu du répertoire `src/` puis on installe les dépendances avec `npm install`. On démarre ensuite le programme node. Pour construire l'image, on se place dans le répertoire contenant le Dockerfile et on utilise la commande `docker build -t res/musician .`  |
 |Question | How can we use the `ENTRYPOINT` statement in our Dockerfile?  |
-| | *Enter your response here...*  |
+| | `ENTRYPOINT` permet de définir quelle commande sera exécutée au démarrage du conteneur. On le défini donc comme suit : `ENTRYPOINT ["node", "/opt/app/app.js"]`. L'argument qui est utilisé lors de la commande `docker run` sera transmis à l'`ENTRYPOINT` et donc sera utilsé comme argument du script node.  |
 |Question | After building our Docker image, how do we use it to **run containers**?  |
-| | *Enter your response here...*  |
+| | Pour démarrer les conteneurs, on utilise la commande `docker run -d res/musician <instrument>`  |
 |Question | How do we get the list of all **running containers**?  |
-| | *Enter your response here...*  |
+| | On utilise la commande `docker ps`  |
 |Question | How do we **stop/kill** one running container?  |
-| | *Enter your response here...*  |
+| | On utilise la commande `docker stop <container>` ou `docker kill <container>`  |
 |Question | How can we check that our running containers are effectively sending UDP datagrams?  |
-| | *Enter your response here...*  |
+| | Dans le script node, un message est affiché sur la console à chaque envoi de datagramme. On peut consulter cette console en utilisant la commande `docker logs <container>`  |
 
 
 ## Task 4: implement an "auditor" Node.js application
