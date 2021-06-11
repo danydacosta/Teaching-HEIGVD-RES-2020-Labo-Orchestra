@@ -46,7 +46,9 @@ function sendSoundNotification() {
     // Ajouter le temps au payload
     var payload = { ...basePayload, "issued_at" : dayjs()}
     var json = JSON.stringify(payload);
+    var message = Buffer.from(json);
 
-    sock.send(json, port, addr);
-    console.log("Sent " + json);
+    sock.send(message, 0, message.length, port, addr, function (err, bytes) {
+        console.log("Sent payload:", payload, "on port", sock.address().port)
+    });
 }
