@@ -160,15 +160,15 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | ---  |
 |Question | With Node.js, how can we listen for UDP datagrams in a multicast group? |
-| | *Enter your response here...*  |
+| | On utilise la même classe `dgram` comme déjà citée ci-dessus et on crée un socket. Ensuite on appelle la fonction `bind` sur le socket et dans la fonction de callback, on utilise la méthode `addMembership` en spécifiant comme paramètre l'adresse multicast à écouter.  |
 |Question | How can we use the `Map` built-in object introduced in ECMAScript 6 to implement a **dictionary**?  |
-| | *Enter your response here...* |
+| | Cette structure de données nous a été pratique pour ce labo. Le clé de la map était les UUID des musicians et les données associées était l'instrument ainsi que le dernier moment d'activité. |
 |Question | How can we use the `Moment.js` npm module to help us with **date manipulations** and formatting?  |
-| | *Enter your response here...* |
+| | Ce module permet de manipuler des dates/heure. On l'a utilisé pour récupérer le moment `issued_at` envoyé par les musicians au format ISO 8601. Après, on a testé si le moment était plus grand ou égal au moment *mainteant - 5 secondes*. Le module offre une méthode substract pour faire une soustraction de secondes. |
 |Question | When and how do we **get rid of inactive players**?  |
-| | *Enter your response here...* |
+| | Quand le client se connecte sur le port TCP, on parcourt toute la map et si le player est jugé inactif on le supprime sinon on le prépare pour l'envoyer au client. |
 |Question | How do I implement a **simple TCP server** in Node.js?  |
-| | *Enter your response here...* |
+| | En utilisant le module `net` offert nativement par Node.js. On crée le serveur avec la méthode `createServer` et ensuite on utilise `listen` pour donner en paramètre le port d'écoute. Pour finir, on utilise l'événement `connection` pour traiter chaque client quand il se connecte avec la fonction de callback.|
 
 
 ## Task 5: package the "auditor" app in a Docker image
@@ -176,7 +176,7 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 | #  | Topic |
 | ---  | --- |
 |Question | How do we validate that the whole system works, once we have built our Docker image? |
-| | *Enter your response here...* |
+| | On teste d'abord en exécutant manuellement les musicians et le auditor pour s'assurer du fonctionnement. La dernière verification s'est faite avec le script de validation fourni. |
 
 
 ## Constraints
